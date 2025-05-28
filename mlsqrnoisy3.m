@@ -21,8 +21,18 @@ function [t,y,inputs]=mlsqrnoisy3(dt0,tmax,cmat,ge,gi,Nm,plotflag,rseed)
 %
 % Suggested usage:
 %
+% Population of 3:
+%
 % cmat=[0 -1 0; 0 0 -1; -1 0 0];
+% (Remember to set initial conditions with init = '3async';)
 % [t,y,inputs]=mlsqrnoisy3(0.2,2e4-1,cmat,1e-2,1e-2,1e3,1);
+%
+% Population of 9:
+%
+% c=ones(3)-eye(3); % this is a self-connected excitatory block
+% cmat=[c,-ones(3),zeros(3);zeros(3),c,-ones(3);-ones(3),zeros(3),c];
+% (Remember to set initial conditions with init = '3-3-3-antisync';)
+% [t,y,inputs]=mlsqrnoisy3(0.2,2e4-1,cmat,1e-2/3,1e-2/6,1e3,1);
 
 tic % record elapsed time
 savefile = ['mlsqrn3_',datestr(now,30),'.mat']; % file for saving results
@@ -75,7 +85,8 @@ exc = sparse(sign(cmat)==1);    % boolean matrix, 1 where j->i excitatory else 0
 inh = sparse(sign(cmat)==-1);   % boolean matrix, 1 where j->i inhibitory else 0
 
 %% Initialize y = [v;w;I;Isyn]
-init = '3async';
+init = '3-3-3-antisync';
+%init = '3async';
 switch init
     case 'rand'
         vinit=-41.84*ones(ncell,1) + 4*randn(ncell,1);
@@ -87,8 +98,8 @@ switch init
         Iinit=30*ones(ncell,1); % to match mlsqr.m
     case '3async'
         vinit=[-30.3211; -29.5578; -34.138];
-            winit=[0.0119; 0.0035; 0.0050];
-            Iinit=[40.3064; 34.3202; 38.4676];
+        winit=[0.0119; 0.0035; 0.0050];
+        Iinit=[40.3064; 34.3202; 38.4676];
     case '2anti'
         vinit=[-26.1210;  -37.9576];
         winit=[0.0122;    0.0032];
@@ -104,7 +115,11 @@ switch init
     case '1432'
         vinit=[-39.9070  11.2514  -31.9199   -36.5675]';
         winit=[0.0026    0.4055    0.0064     0.0037]';
-        Iinit=[32.2853   37.9563   39.7143    36.4382]';        
+        Iinit=[32.2853   37.9563   39.7143    36.4382]';    
+    case '3-3-3-antisync'
+        vinit=[-30.3211*[1;1;1]; -29.5578*[1;1;1]; -34.138*[1;1;1]];
+        winit=[0.0119*[1;1;1]; 0.0035*[1;1;1]; 0.0050*[1;1;1]];
+        Iinit=[40.3064*[1;1;1]; 34.3202*[1;1;1]; 38.4676*[1;1;1]];
 end
 inputs{7}=init;
 Isyninit=zeros(ncell,1);
