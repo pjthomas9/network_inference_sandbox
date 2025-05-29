@@ -39,7 +39,6 @@ end
 
 %% Convolve the spike trains with decaying exponentials
 
-keyboard
 for i=1:ntau
     for j=1:nv
         u(i+ntau*(j-1),:)=conv(((v(1,1:(end-1))<vthresh).*(vthresh<=v(1,2:end))),filt(i,:),'same');
@@ -57,12 +56,14 @@ plot(t/1000,vthresh*ones(size(t)))
 set(gca,'FontSize',16)
 ylabel('V(t)')
 title('Spike train convolved with exponentials')
-xlim([0 .6]),grid on
+%xlim([0 .6])
+grid on
 for i=1:ntau
     subplot(ntau+1,1,i+1)
     plot(t(1:end-1)/1000,u(i,:))
     ylabel(['\tau=',num2str(tau_vec(i))])
     set(gca,'FontSize',16)
-xlim([0 .6]),grid on
+    %xlim([0 .6])
+    grid on
 end
 xlabel('Time (sec)')
